@@ -1113,7 +1113,7 @@ const Contract  = () => {
 
     }
 
-    const address = "0x550c71d75562a014511d9e0de9c75aa0dc3759fd";    //Mainnet
+    const address = "0x8fb914e54436a89f6c5feedc6a246b02410ea299";    //Mainnet
     const compiled = {
         "Adventure": {
             "abi":[
@@ -1507,7 +1507,7 @@ const Contract  = () => {
                     from: account,
                     to: address,
                     data:toSend.encodeABI(),
-                    value:4000000000000000
+                    value:5000000000000000
                 },(err,hash)=>{
                     callback({
                         accepted: !err,

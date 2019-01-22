@@ -3,8 +3,8 @@ pragma solidity ^0.5.0;
 contract EtherSNATCH {
     /*
     Original game Adventureum 0x77b4acc38da51a0e77c77355cfd28c1a6619f6ba
-    by AnAllergyToAnalogy
-    Forked by Econymous
+    Original creator AnAllergyToAnalogy
+    Modified by Econymous
     */
 
     //Gotta encode and decode the choice strings on the frontend
@@ -63,7 +63,7 @@ contract EtherSNATCH {
         string memory situationText,
         bytes32[] memory choiceTexts) payable public{
         //Pay up
-        require(msg.value == 3500000000000000, "pay up");
+        require(msg.value == 5000000000000000, "pay up");
 
         //Make sure there is still at least one open pathway
         require(pathwayCount + choiceTexts.length > 1, "pathwayCount");
@@ -98,12 +98,12 @@ contract EtherSNATCH {
         //Sign your name
         authors[situationCount] = msg.sender;
 
-        //Pass earnings up 3 steps
+        //Pass earnings X steps where X = choiceTexts.length
         uint upperSituation = fromSituation;
         uint remainingEth = msg.value;
         uint reward;
         uint optionCount;
-        for(uint i = 0; i<3; i++){
+        for(uint i = 0; i<(choiceTexts.length-1); i++){
             optionCount = options[upperSituation];
             reward = 0;
             if(optionCount > 1){

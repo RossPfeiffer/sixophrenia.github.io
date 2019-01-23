@@ -975,28 +975,6 @@ function Game(container,contract){
             )
 
 
-            let mineableGoldData
-            console.log("Game path",game.path)
-            /*async () => { */
-            mineableGoldData = await contract.see_gold(game.path)
-            //} ;
-            let estimatedGold = 0
-            for(let i = 0;i<game.path.length;i+=1){
-              let gold = mineableGoldData[0][i]
-              let div = mineableGoldData[1][i]
-              estimatedGold += (gold-(gold/div))/div
-            }
-            let formattedGold = (estimatedGold/1000000000000000000).toFixed(4)
-
-            let collect_gold = Option("Mine "+formattedGold+" ETH");
-            collect_gold.className ="goldy"
-            collect_gold.id = "gold-mine"
-            onClick(collect_gold,game.collect_gold);
-            game.screens.situation.insertBefore(
-                collect_gold,
-                game.screens.situation.children[c++]
-            )
-
             game.show_screen('situation');
 
 
@@ -1020,9 +998,7 @@ function Game(container,contract){
                 game.prompt_situation_creation(from_situation,from_choice);
             }
         },
-        collect_gold: async () => {
-            let collectedGold = await contract.mine_gold(game.path);
-        }
+
     };
     game.init();
     game.start();
@@ -1113,256 +1089,205 @@ const Contract  = () => {
 
     }
 
-    const address = "0x8fb914e54436a89f6c5feedc6a246b02410ea299";    //Mainnet
+    const address = "0xecdafa6b22f6f049700f168babc89c80c45b9427";    //Mainnet
     const compiled = {
         "Adventure": {
-            "abi":[
-                    	{
-                    		"constant": false,
-                    		"inputs": [
-                    			{
-                    				"name": "signature",
-                    				"type": "string"
-                    			}
-                    		],
-                    		"name": "add_signature",
-                    		"outputs": [],
-                    		"payable": false,
-                    		"stateMutability": "nonpayable",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": false,
-                    		"inputs": [
-                    			{
-                    				"name": "fromSituation",
-                    				"type": "uint256"
-                    			},
-                    			{
-                    				"name": "fromChoice",
-                    				"type": "uint256"
-                    			},
-                    			{
-                    				"name": "situationText",
-                    				"type": "string"
-                    			},
-                    			{
-                    				"name": "choiceTexts",
-                    				"type": "bytes32[]"
-                    			}
-                    		],
-                    		"name": "add_situation",
-                    		"outputs": [],
-                    		"payable": true,
-                    		"stateMutability": "payable",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": false,
-                    		"inputs": [
-                    			{
-                    				"name": "situations",
-                    				"type": "uint256[]"
-                    			}
-                    		],
-                    		"name": "mine_gold",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "nonpayable",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": false,
-                    		"inputs": [],
-                    		"name": "pull_earnings",
-                    		"outputs": [],
-                    		"payable": false,
-                    		"stateMutability": "nonpayable",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"inputs": [
-                    			{
-                    				"name": "situationText",
-                    				"type": "string"
-                    			},
-                    			{
-                    				"name": "choiceTexts",
-                    				"type": "bytes32[]"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "nonpayable",
-                    		"type": "constructor"
-                    	},
-                    	{
-                    		"anonymous": false,
-                    		"inputs": [
-                    			{
-                    				"indexed": true,
-                    				"name": "id",
-                    				"type": "uint256"
-                    			},
-                    			{
-                    				"indexed": false,
-                    				"name": "situationText",
-                    				"type": "string"
-                    			},
-                    			{
-                    				"indexed": false,
-                    				"name": "choiceTexts",
-                    				"type": "bytes32[]"
-                    			}
-                    		],
-                    		"name": "Situation",
-                    		"type": "event"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "situation",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"name": "get_author",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "address"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "author",
-                    				"type": "address"
-                    			}
-                    		],
-                    		"name": "get_earnings",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "fromSituation",
-                    				"type": "uint256"
-                    			},
-                    			{
-                    				"name": "fromChoice",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"name": "get_next_situation",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			},
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [],
-                    		"name": "get_pathwayCount",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "situation",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"name": "get_signature",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "string"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"name": "gold",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	},
-                    	{
-                    		"constant": true,
-                    		"inputs": [
-                    			{
-                    				"name": "situations",
-                    				"type": "uint256[]"
-                    			}
-                    		],
-                    		"name": "see_gold",
-                    		"outputs": [
-                    			{
-                    				"name": "",
-                    				"type": "uint256[]"
-                    			},
-                    			{
-                    				"name": "",
-                    				"type": "uint256[]"
-                    			}
-                    		],
-                    		"payable": false,
-                    		"stateMutability": "view",
-                    		"type": "function"
-                    	}
-                    ]
+            "abi":  [
+                            	{
+                            		"constant": false,
+                            		"inputs": [
+                            			{
+                            				"name": "signature",
+                            				"type": "string"
+                            			}
+                            		],
+                            		"name": "add_signature",
+                            		"outputs": [],
+                            		"payable": false,
+                            		"stateMutability": "nonpayable",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": false,
+                            		"inputs": [
+                            			{
+                            				"name": "fromSituation",
+                            				"type": "uint256"
+                            			},
+                            			{
+                            				"name": "fromChoice",
+                            				"type": "uint256"
+                            			},
+                            			{
+                            				"name": "situationText",
+                            				"type": "string"
+                            			},
+                            			{
+                            				"name": "choiceTexts",
+                            				"type": "bytes32[]"
+                            			}
+                            		],
+                            		"name": "add_situation",
+                            		"outputs": [],
+                            		"payable": true,
+                            		"stateMutability": "payable",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": false,
+                            		"inputs": [],
+                            		"name": "pull_earnings",
+                            		"outputs": [],
+                            		"payable": false,
+                            		"stateMutability": "nonpayable",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"inputs": [],
+                            		"payable": false,
+                            		"stateMutability": "nonpayable",
+                            		"type": "constructor"
+                            	},
+                            	{
+                            		"anonymous": false,
+                            		"inputs": [
+                            			{
+                            				"indexed": true,
+                            				"name": "id",
+                            				"type": "uint256"
+                            			},
+                            			{
+                            				"indexed": false,
+                            				"name": "situationText",
+                            				"type": "string"
+                            			},
+                            			{
+                            				"indexed": false,
+                            				"name": "choiceTexts",
+                            				"type": "bytes32[]"
+                            			}
+                            		],
+                            		"name": "Situation",
+                            		"type": "event"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [
+                            			{
+                            				"name": "situation",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"name": "get_author",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "address"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [
+                            			{
+                            				"name": "author",
+                            				"type": "address"
+                            			}
+                            		],
+                            		"name": "get_earnings",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [
+                            			{
+                            				"name": "fromSituation",
+                            				"type": "uint256"
+                            			},
+                            			{
+                            				"name": "fromChoice",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"name": "get_next_situation",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			},
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [],
+                            		"name": "get_pathwayCount",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [
+                            			{
+                            				"name": "situation",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"name": "get_signature",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "string"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	},
+                            	{
+                            		"constant": true,
+                            		"inputs": [
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"name": "gold",
+                            		"outputs": [
+                            			{
+                            				"name": "",
+                            				"type": "uint256"
+                            			}
+                            		],
+                            		"payable": false,
+                            		"stateMutability": "view",
+                            		"type": "function"
+                            	}
+                            ]
           }
     };
 
@@ -1445,9 +1370,6 @@ const Contract  = () => {
         get_earnings: async () => {
             return await instance.methods.get_earnings(account).call();
         },
-        see_gold: async (paths) => {
-            return await instance.methods.see_gold(paths).call();
-        },
         pull_earnings: async () => {
             //TODO: get the callback,
             try{
@@ -1466,30 +1388,6 @@ const Contract  = () => {
                 console.log('pull_earnings tx sent');
             }catch(err){
                 console.log('pull_earnings tx failed');
-            }
-            return {
-                accepted: true,
-                hash: '0x0'
-            }
-        },
-        mine_gold: async (paths) => {
-            //TODO: get the callback,
-            try{
-                let toSend = instance.methods.mine_gold( paths.reverse() );
-                web3.eth.sendTransaction({
-                    from: account,
-                    to: address,
-                    data:toSend.encodeABI()
-                },(err,hash)=>{
-                    /*callback({
-                        accepted: !err,
-                        hash: hash
-                    });*/
-                });
-
-                console.log('mining tx sent');
-            }catch(err){
-                console.log('mining tx failed');
             }
             return {
                 accepted: true,

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.1;
 
 contract EtherSNATCH {
     /*
@@ -39,22 +39,22 @@ contract EtherSNATCH {
     uint miningCart;
 
 
-    constructor(string memory situationText, bytes32[] memory choiceTexts) public {
-
-      require(choiceTexts.length > 0,"choices");
-
+    constructor() public {
       //Define the option count
-      options[0] = choiceTexts.length;
+      options[0] = 5;
 
       //Set how many remaining open paths there are
-      pathwayCount = choiceTexts.length;
-
-      previousSituation[0] = 0;//this is just for earnings
+      pathwayCount = 5;
 
       //Sign your name
       authors[0] = msg.sender;
-
-      emit Situation(0,situationText,choiceTexts);
+      bytes32[] memory choiceTexts = new bytes32[](5);
+      choiceTexts[0] = "Head towards the forest";
+      choiceTexts[1] = "Explore the field";
+      choiceTexts[2] = "Approach the village";
+      choiceTexts[3] = "Go back to sleep";
+      choiceTexts[4] = "Start towards the mountains";
+      emit Situation(0,"You awake in a vast lush grassy field. In the distance, you see a vibrant forest on one side of the horizon and a complex of mountains on the other. In the opposite direction you see smoke coming from a small town far down the slope of the grassy plains.",choiceTexts);
     }
 
     function add_situation(
@@ -100,20 +100,42 @@ contract EtherSNATCH {
 
         //Pass earnings X steps where X = choiceTexts.length
         uint upperSituation = fromSituation;
-        uint remainingEth = msg.value;
+        uint goldToPassUp = msg.value;
         uint reward;
-        uint optionCount;
-        for(uint i = 0; i<(choiceTexts.length-1); i++){
+        uint optionCount = options[upperSituation];
+        uint i;
+
+        if(optionCount > 1){
+            reward = goldToPassUp/optionCount;
+            earnings[authors[upperSituation]] += reward;
+        }
+        goldToPassUp -= reward;
+        upperSituation = previousSituation[upperSituation];
+
+        gold[upperSituation] += goldToPassUp;//this will be passed up later by miners
+
+        //Push mining cart
+        for(i = 0; i<choiceTexts.length; i+=1){
+          goldToPassUp = gold[miningCart];
+          if(goldToPassUp>0){
+            gold[miningCart] = 0;
+            upperSituation = previousSituation[ miningCart ];
             optionCount = options[upperSituation];
             reward = 0;
-            if(optionCount > 1){
-                reward = remainingEth/optionCount;
-                earnings[authors[upperSituation]] += reward;
+            if(optionCount>1){
+              reward = goldToPassUp/optionCount;
+              goldToPassUp -= reward;
+              earnings[authors[upperSituation]] += reward;
             }
-            remainingEth -= reward;
-            upperSituation = previousSituation[upperSituation];
+            gold[upperSituation] += goldToPassUp;
+          }
+
+          if(miningCart==0){
+            miningCart = situationCount;
+          }else{
+            miningCart -= 1;
+          }
         }
-        gold[upperSituation] += remainingEth;//this will be passed up later by miners
 
         emit Situation(situationCount,situationText,choiceTexts);
     }
@@ -123,70 +145,6 @@ contract EtherSNATCH {
       require(earnings[wallet]>0,"What are you even trying to withdraw?");
       msg.sender.transfer( earnings[wallet] );
       earnings[wallet] = 0;
-    }
-
-    function see_gold(uint[] memory situations) public view returns(uint[] memory, uint[] memory){
-      uint[] memory mineableGold = new uint[](situations.length);
-      uint[] memory taxingDivision = new uint[](situations.length);
-      for(uint i = 0; i<situations.length; i+=1){
-        mineableGold[i] = gold[situations[i]];
-        taxingDivision[i] = options[situations[i]];
-      }
-      return (mineableGold, taxingDivision);
-    }
-
-    function mine_gold(uint[] memory situations) public returns(uint){
-      uint upperSituation;
-      uint collectedGold = 0;
-      uint upperOptionCount;
-      uint writersReward;
-      uint minersReward;
-      uint goldToPassUp;
-      uint i;
-      for(i = 0; i<situations.length; i+=1){
-        goldToPassUp = gold[situations[i]];
-        if(goldToPassUp>0){
-          gold[situations[i]] = 0;
-          upperSituation = previousSituation[ situations[i] ];
-          upperOptionCount = options[upperSituation];
-          writersReward = 0;
-          minersReward = 0;
-          if(upperOptionCount>1){
-            writersReward = goldToPassUp/upperOptionCount;
-            goldToPassUp -= writersReward;
-            earnings[authors[upperSituation]] += writersReward;
-            minersReward = goldToPassUp/upperOptionCount;
-          }
-          gold[upperSituation] += goldToPassUp - minersReward;
-          collectedGold += minersReward;
-        }
-      }
-
-      for(i = 0; i<10; i+=1){
-        goldToPassUp = gold[miningCart];
-        if(goldToPassUp>0){
-          gold[miningCart] = 0;
-          upperSituation = previousSituation[ miningCart ];
-          upperOptionCount = options[upperSituation];
-          writersReward = 0;
-          if(upperOptionCount>1){
-            writersReward = goldToPassUp/upperOptionCount;
-            goldToPassUp -= writersReward;
-            earnings[authors[upperSituation]] += writersReward;
-          }
-          gold[upperSituation] += goldToPassUp;
-        }
-
-        if(miningCart==0){
-          miningCart = situationCount;
-        }else{
-          miningCart -= 1;
-        }
-      }
-
-      if(collectedGold>0){
-        msg.sender.transfer(collectedGold);
-      }
     }
 
     function add_signature(string memory signature) public{

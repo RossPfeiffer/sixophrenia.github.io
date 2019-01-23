@@ -646,7 +646,7 @@ function Game(container,contract){
                 game.open_learn();
             });
 
-
+            onClick(ById("withdraw"),contract.pull_earnings)
 
             //Buttons wait
             onClick(ById("wait-sign"), ()=>{
@@ -732,7 +732,7 @@ function Game(container,contract){
                   ById("earnings-amount").innerHTML = (earnings/1000000000000000000).toFixed(4)
                   let wEl = ById("withdraw");
                   Show(wEl,earnings>0)
-                  onClick(wEl,contract.pull_earnings)
+
 
                   let screen_elements = game.screens.welcome.children;
                   game.reveals(screen_elements);
